@@ -7,31 +7,42 @@ if ($_SERVER["REQUEST_METHOD"] !== "GET") {
     respond(false, "Phương thức không hợp lệ.");
 }
 
+// Lấy category_id nếu có (để lọc theo danh mục)
+$category_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
+
 // Bắt đầu truy vấn
-// LƯU Ý: Đảm bảo trường 'is_available' (có trong database_setup.sql) là TRUE
-$sql = "SELECT id, name, price, image_url FROM dishes WHERE is_available = TRUE ORDER BY id ASC";
-$result = $conn->query($sql);
+$sql = "SELECT d.id, d.name, d.price, d.image_url, d.description, c.name as category_name
+        FROM dishes d
+        LEFT JOIN categories c ON d.category_id = c.id
+        WHERE d.is_available = TRUE";
+
+if ($category_id) {
+    $sql .= " AND d.category_id = ?";
+}
+
+$sql .= " ORDER BY d.id ASC";
+
+$stmt = $conn->prepare($sql);
+if ($category_id) {
+    $stmt->bind_param("i", $category_id);
+}
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($result) {
     $dishes = [];
     if ($result->num_rows > 0) {
         // Lấy từng hàng dữ liệu
         while($row = $result->fetch_assoc()) {
-            // ********** ĐIỀU CHỈNH ĐƯỜNG DẪN ẢNH (TRÁNH 404 / DOUBLE PREFIX) **********
-            // Nếu trong DB trường image_url đã chứa đường dẫn đầy đủ (http://, https://),
-            // bắt đầu bằng '/' hoặc đã bắt đầu bằng 'images/', thì giữ nguyên.
-            // Ngược lại, thêm tiền tố 'images/' (vì ảnh lưu trong thư mục root 'images/').
+            // Điều chỉnh đường dẫn ảnh
             $img = trim($row['image_url']);
             if (preg_match('/^(https?:\/\/|\/|images\/)/i', $img) || $img === '') {
-                // dùng nguyên giá trị nếu đã là đường dẫn đầy đủ hoặc đã có tiền tố
                 $row['image_url'] = $img;
             } else {
                 $row['image_url'] = 'images/' . $img;
             }
-            // *************************************************************************
 
-            // Đảm bảo price là integer trước khi gửi đi
-            $row['price'] = (int) $row['price'];
+            $row['price'] = (int)$row['price'];
             $dishes[] = $row;
         }
         respond(true, "Tải món ăn thành công.", $dishes);
@@ -39,10 +50,9 @@ if ($result) {
         respond(false, "Không tìm thấy món ăn nào.", []);
     }
 } else {
-    // Lỗi truy vấn SQL
     respond(false, "Lỗi truy vấn SQL: " . $conn->error);
 }
 
-// Đóng kết nối
+$stmt->close();
 $conn->close();
 ?>

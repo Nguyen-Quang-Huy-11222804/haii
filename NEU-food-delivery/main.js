@@ -120,7 +120,8 @@ if (document.readyState == 'loading') {
 function ready() {
     // Khởi tạo các event listeners cho Giỏ hàng
     setupCartListeners();
-    // Tải món ăn động từ API
+    // Tải danh mục và món ăn động từ API
+    fetchAndDisplayCategories();
     if (document.getElementById('product-list')) {
         fetchAndDisplayProducts();
     }
@@ -139,7 +140,7 @@ function ready() {
 }
 
 // --- API FETCH LOGIC (Kiểm tra lỗi Render) ---
-async function fetchAndDisplayProducts() {
+async function fetchAndDisplayProducts(categoryId = null) {
     // Lấy ID chính xác từ HTML mới
     const shopContent = document.getElementById('product-list'); 
     const loadingMessage = document.getElementById('loading-message');
@@ -151,8 +152,12 @@ async function fetchAndDisplayProducts() {
     if (loadingMessage) loadingMessage.style.display = 'flex'; 
 
     try {
-        console.log("Đang gọi API:", API_BASE_URL + 'get_dishes.php');
-        const response = await fetch(API_BASE_URL + 'get_dishes.php');
+        let url = API_BASE_URL + 'get_dishes.php';
+        if (categoryId) {
+            url += '?category_id=' + categoryId;
+        }
+        console.log("Đang gọi API:", url);
+        const response = await fetch(url);
         
         // KIỂM TRA PHẢN HỒI HTTP (Rất quan trọng)
         if (!response.ok) {
@@ -204,6 +209,40 @@ async function fetchAndDisplayProducts() {
         console.error("LỖI KHÔNG TẢI ĐƯỢC MÓN ĂN:", error);
         if (loadingMessage) loadingMessage.style.display = 'none';
         shopContent.innerHTML = `<div class="text-center w-full col-span-full py-10 text-xl text-red-500">Lỗi: Không thể kết nối hoặc Server gặp lỗi. (Xem Console)</div>`;
+    }
+}
+
+// Load categories
+async function fetchAndDisplayCategories() {
+    try {
+        const response = await fetch(API_BASE_URL + 'get_categories.php');
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+            const categoryFilter = document.querySelector('.category-filter');
+            const allBtn = categoryFilter.querySelector('.category-btn');
+            
+            result.data.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.textContent = category.name;
+                btn.setAttribute('data-category-id', category.id);
+                categoryFilter.appendChild(btn);
+            });
+            
+            // Add event listeners for category buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    const categoryId = btn.getAttribute('data-category-id') || null;
+                    fetchAndDisplayProducts(categoryId);
+                });
+            });
+        }
+    } catch (error) {
+        console.error("Lỗi tải danh mục:", error);
     }
 }
 
@@ -444,8 +483,12 @@ function setupAuthForm() {
                 const data = await resp.json().catch(() => ({ success: false, message: 'Phản hồi không hợp lệ từ server.' }));
                 if (data.success) {
                     await showModal('Thành công', data.message || 'Đăng nhập thành công.');
-                    // Redirect về trang chủ
-                    window.location.href = 'index.html';
+                    // Redirect based on role
+                    if (data.user && data.user.role === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
                 } else {
                     showModal('Thất bại', data.message || 'Đăng nhập thất bại.');
                 }

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - NEU Food</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>NEU Food - Admin Dashboard</h1>
+            <div class="admin-nav">
+                <button id="logout-btn" class="btn-logout">Đăng xuất</button>
+            </div>
+        </header>
+
+        <nav class="admin-sidebar">
+            <ul>
+                <li><a href="#orders" class="nav-link active" data-section="orders">Quản lý đơn hàng</a></li>
+                <li><a href="#products" class="nav-link" data-section="products">Quản lý sản phẩm</a></li>
+                <li><a href="#categories" class="nav-link" data-section="categories">Quản lý danh mục</a></li>
+                <li><a href="#statistics" class="nav-link" data-section="statistics">Thống kê</a></li>
+            </ul>
+        </nav>
+
+        <main class="admin-main">
+            <section id="orders-section" class="admin-section active">
+                <h2>Quản lý đơn hàng</h2>
+                <div id="orders-list"></div>
+            </section>
+
+            <section id="products-section" class="admin-section">
+                <h2>Quản lý sản phẩm</h2>
+                <button id="add-product-btn" class="btn-add">Thêm sản phẩm</button>
+                <div id="products-list"></div>
+            </section>
+
+            <section id="categories-section" class="admin-section">
+                <h2>Quản lý danh mục</h2>
+                <button id="add-category-btn" class="btn-add">Thêm danh mục</button>
+                <div id="categories-list"></div>
+            </section>
+
+            <section id="statistics-section" class="admin-section">
+                <h2>Thống kê</h2>
+                <div id="stats-content"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals for forms -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="product-modal-title">Thêm sản phẩm</h3>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                <label>Tên sản phẩm:</label>
+                <input type="text" id="product-name" required>
+                <label>Mô tả:</label>
+                <textarea id="product-description"></textarea>
+                <label>Giá:</label>
+                <input type="number" id="product-price" required>
+                <label>URL ảnh:</label>
+                <input type="text" id="product-image">
+                <label>Danh mục:</label>
+                <select id="product-category" required></select>
+                <button type="submit">Lưu</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="category-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="category-modal-title">Thêm danh mục</h3>
+            <form id="category-form">
+                <input type="hidden" id="category-id">
+                <label>Tên danh mục:</label>
+                <input type="text" id="category-name" required>
+                <label>Mô tả:</label>
+                <textarea id="category-description"></textarea>
+                <button type="submit">Lưu</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
