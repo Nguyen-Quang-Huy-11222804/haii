@@ -27,7 +27,7 @@ if (empty($email) || empty($password)) {
 }
 
 // --- 2. Truy vấn Database để lấy thông tin người dùng và mật khẩu đã mã hóa ---
-$sql = "SELECT id, fullname, email, password FROM users WHERE email = ?";
+$sql = "SELECT id, fullname, email, password, role FROM users WHERE email = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -47,6 +47,7 @@ if ($result->num_rows === 1) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_fullname'] = $user['fullname'];
+        $_SESSION['user_role'] = $user['role'];
         $_SESSION['loggedin'] = true;
         
         http_response_code(200);
@@ -56,7 +57,8 @@ if ($result->num_rows === 1) {
             "user" => [
                 "id" => $user['id'],
                 "fullname" => $user['fullname'],
-                "email" => $user['email']
+                "email" => $user['email'],
+                "role" => $user['role']
             ]
         ], JSON_UNESCAPED_UNICODE);
         
