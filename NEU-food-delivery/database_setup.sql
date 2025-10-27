@@ -62,9 +62,7 @@ CREATE TABLE IF NOT EXISTS order_items (
     FOREIGN KEY (dish_id) REFERENCES dishes(id) ON DELETE CASCADE
 );
 
--- Insert default admin user (password: admin123)
-INSERT INTO users (email, fullname, password, role) VALUES
-('admin@neu.edu.vn', 'Admin NEU', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+-- Tao tai khoan thong thuong roi vao database chuyen role thanh admin
 
 -- Insert sample categories
 INSERT INTO categories (name, description) VALUES
