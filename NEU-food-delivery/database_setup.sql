@@ -75,9 +75,15 @@ INSERT INTO categories (name, description) VALUES
 
 -- Insert sample dishes
 INSERT INTO dishes (name, description, price, image_url, category_id) VALUES
-('Phở bò', 'Phở bò truyền thống', 45000, 'pho_bo.jpg', 1),
-('Cơm tấm', 'Cơm tấm sườn bì', 35000, 'com_tam.jpg', 1),
-('Sinh tố bơ', 'Sinh tố bơ tươi', 25000, 'sinh_to_bo.jpg', 2),
-('Trà sữa', 'Trà sữa trân châu', 30000, 'tra_sua.jpg', 2),
-('Bánh flan', 'Bánh flan caramel', 20000, 'banh_flan.jpg', 3),
-('Khoai tây chiên', 'Khoai tây chiên giòn', 15000, 'khoai_tay_chien.jpg', 4);
+('Phở bò', 'Phở bò truyền thống', 45000, 'pho-bo-ha-noi-thumb_980349ef2bcf40c9b736a672e5a944d3.jpg', 1),
+('Cơm tấm', 'Cơm tấm sườn bì', 35000, 'com-tam.jpg', 1),
+('Bún riêu', 'Bún riêu cua Hà Nội', 40000, 'cach_nau_bun_rieu_cua_ha_noi_ed8278d38b.webp', 1),
+('Bún chả', 'Bún chả Hà Nội', 45000, 'Quan-bun-cha-ha-noi-o-TPHCM.jpg', 1),
+('Sinh tố bơ', 'Sinh tố bơ tươi', 25000, 'tra1.jpg', 2),
+('Trà sữa', 'Trà sữa trân châu', 30000, 'takoyaki-recipe_done.png.webp', 2),
+('Bánh flan', 'Bánh flan caramel', 20000, 'banh-flan-caramen.jpg', 3),
+('Bánh cuốn', 'Bánh cuốn nóng', 35000, 'banh-cuon-hinh-anh-mon-an-dac-san-viet-nam.jpg', 3),
+('Bánh mì', 'Bánh mì thịt', 25000, 'banh-mi.jpg', 3),
+('Xôi xéo', 'Xôi xéo mặn', 20000, 'xoi-xeo-01 (2)_1632322118.jpg', 3),
+('Bún đậu', 'Bún đậu mắm tôm', 30000, 'Bun-dau-mam-tom-tai-nha-6.jpg', 4),
+('Bánh bao', 'Bánh bao nhân thịt', 15000, '1-Banh-bao-nhan-thit.jpg', 4);
