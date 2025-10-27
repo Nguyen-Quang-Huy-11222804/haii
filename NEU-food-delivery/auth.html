@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập / Đăng kí - NEU Food</title>
+    <!-- Tải Tailwind CSS để styling nhanh và đẹp -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải Boxicons cho các icon -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script>
+        // Cấu hình Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'main-color': '#fd4646',
+                        'text-color': '#171427',
+                        'neu-blue': '#007BFF', 
+                        'neu-gray': '#F7F7FF',
+                    },
+                    fontFamily: {
+                        'sans': ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Định nghĩa style cho input group dựa trên Tailwind */
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background-color: white;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.2s;
+        }
+        .input-group:focus-within {
+            border-color: #007BFF;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+        .input-group input {
+            border: none;
+            width: 100%;
+            outline: none;
+            padding: 0;
+            color: #171427;
+        }
+        /* Style cho checkbox để đồng bộ */
+        input[type="checkbox"] {
+            appearance: none;
+            height: 1rem;
+            width: 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            position: relative;
+            margin-right: 0.5rem;
+            top: 2px;
+            background-color: white;
+        }
+        input[type="checkbox"]:checked {
+            background-color: #007BFF;
+            border-color: #007BFF;
+        }
+        input[type="checkbox"]:checked::after {
+            content: '\2713'; /* Checkmark icon */
+            font-size: 0.75rem;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 bg-gray-100">
+
+    <div class="w-full max-w-md bg-white p-8 md:p-10 rounded-xl shadow-2xl transition duration-300">
+        
+        <!-- Nút quay lại trang chủ -->
+        <a href="index.html" class="text-main-color hover:text-red-700 transition duration-150 flex items-center mb-6">
+            <i class='bx bx-arrow-back text-2xl mr-2'></i>
+            <span class="font-semibold">Quay lại Trang chủ</span>
+        </a>
+
+        <!-- Tiêu đề chung -->
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-text-color mb-1">Chào mừng bạn!</h1>
+            <p class="text-gray-500">Hãy đăng nhập hoặc đăng kí để tiếp tục</p>
+        </div>
+
+        <!-- Bộ chuyển đổi giữa Đăng nhập và Đăng kí -->
+        <div class="flex border-2 border-blue-500 rounded-lg mb-8" id="tab-switcher">
+            <button id="login-tab" class="flex-1 py-3 text-sm font-semibold rounded-l-lg transition duration-200 text-blue-500 bg-white">
+                Đăng nhập
+            </button>
+            <button id="register-tab" class="flex-1 py-3 text-sm font-semibold rounded-r-lg transition duration-200 text-red-500 bg-white">
+                Đăng kí
+            </button>
+        </div>
+
+        <!-- Form Đăng nhập -->
+        <form id="login-form" class="space-y-6">
+            <p class="text-center text-sm text-gray-500">Hoặc đăng nhập bằng tài khoản của bạn</p>
+            
+            <!-- Trường Tên đăng nhập hoặc Email -->
+            <div>
+                <label for="login-username" class="sr-only">Tên đăng nhập hoặc Email</label>
+                <div class="input-group">
+                    <i class='bx bxs-user-circle text-gray-400 text-xl mr-3'></i>
+                    <input type="text" id="login-username" placeholder="Tên đăng nhập hoặc Email" required>
+                </div>
+            </div>
+
+            <!-- Trường Mật khẩu -->
+            <div>
+                <label for="login-password" class="sr-only">Mật khẩu</label>
+                <div class="input-group">
+                    <i class='bx bxs-lock-alt text-gray-400 text-xl mr-3'></i>
+                    <input type="password" id="login-password" placeholder="Mật khẩu" required>
+                </div>
+            </div>
+
+            <!-- Ghi nhớ và Quên mật khẩu -->
+            <div class="flex justify-between items-center text-sm">
+                <div class="flex items-center">
+                    <input type="checkbox" id="remember-me">
+                    <label for="remember-me" class="ml-2 text-gray-700">Lưu thông tin đăng nhập</label>
+                </div>
+                <a href="#" class="text-blue-500 hover:underline font-medium transition duration-150">Quên mật khẩu?</a>
+            </div>
+
+            <!-- Nút ĐĂNG NHẬP -->
+            <button type="submit" class="w-full py-3 bg-blue-500 text-white font-bold rounded-lg shadow-lg hover:bg-blue-600 transition duration-200">
+                ĐĂNG NHẬP
+            </button>
+        </form>
+
+        <!-- Form Đăng kí (Ẩn ban đầu) -->
+        <form id="register-form" class="space-y-6 hidden">
+            <!-- Trường Email -->
+            <div>
+                <label for="register-email" class="sr-only">Email</label>
+                <div class="input-group">
+                    <i class='bx bxs-envelope text-gray-400 text-xl mr-3'></i>
+                    <input type="email" id="register-email" placeholder="Email (dùng để đăng nhập)" required>
+                </div>
+            </div>
+            
+            <!-- Trường Họ và Tên -->
+            <div>
+                <label for="register-name" class="sr-only">Họ và Tên</label>
+                <div class="input-group">
+                    <i class='bx bxs-user text-gray-400 text-xl mr-3'></i>
+                    <input type="text" id="register-name" placeholder="Họ và Tên của bạn" required>
+                </div>
+            </div>
+
+            <!-- Trường Mật khẩu -->
+            <div>
+                <label for="register-password" class="sr-only">Mật khẩu</label>
+                <div class="input-group">
+                    <i class='bx bxs-lock-alt text-gray-400 text-xl mr-3'></i>
+                    <input type="password" id="register-password" placeholder="Mật khẩu" required>
+                </div>
+            </div>
+
+            <!-- Trường Nhập lại Mật khẩu -->
+            <div>
+                <label for="register-confirm-password" class="sr-only">Nhập lại Mật khẩu</label>
+                <div class="input-group">
+                    <i class='bx bxs-check-shield text-gray-400 text-xl mr-3'></i>
+                    <input type="password" id="register-confirm-password" placeholder="Nhập lại Mật khẩu" required>
+                </div>
+            </div>
+
+            <!-- Nút ĐĂNG KÍ -->
+            <button type="submit" class="w-full py-3 bg-main-color text-white font-bold rounded-lg shadow-lg hover:bg-red-600 transition duration-200">
+                ĐĂNG KÍ
+            </button>
+        </form>
+    </div>
+
+    <!-- Tải script cho chức năng form và modal -->
+    <script src="main.js"></script> 
+</body>
+</html>

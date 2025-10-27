@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEU Food Delivery</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Tải Boxicons cho các icon -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Tải Tailwind CSS cho styling của Modal và các link (chỉ CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <!-----------------HEADER--------------------->
+    <header>
+        <!------------------NAV BAR----------------------->
+        <div class="nav container">
+            <a href="#" class="logo">NEU Food</a>
+            
+            <!-- Khu vực Icon và Link Người dùng -->
+            <div class="flex items-center space-x-4"> 
+                <!-- Link Đăng nhập/Đăng kí -->
+                <a href="auth.html" class="nav-auth-link flex items-center" style="font-weight: 500;">
+                    <i class='bx bx-user' style="margin-right: 4px;"></i> Đăng nhập/Đăng kí
+                </a>
+                <!-- Icon Giỏ hàng -->
+                <i class='bx bx-shopping-bag' id="cart-icon">
+                    <span id="cart-count">0</span>
+                </i>
+            </div>
+
+            <div class="cart">
+                <h2 class="cart-title">Giỏ Hàng</h2>
+                <div class="cart-content">
+                    <!-- NỘI DUNG GIỎ HÀNG ĐƯỢC THÊM BẰNG JS -->
+                </div>
+
+                <div class="total">
+                    <div class="total-title">Tổng cộng</div>
+                    <div class="total-price">0 VNĐ</div>
+                </div>
+                <!-- Nút MUA HÀNG -->
+                <a href="checkout.html" class="btn-buy" id="checkout-btn">Thanh toán</a>
+                <!-- Icon Đóng giỏ hàng -->
+                <i class='bx bx-x' id="close-cart"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SHOP SECTION -->
+    <section class="shop container">
+        <h2 class="section-title">Các món ăn phổ biến</h2>
+        
+        <!-- Loading Indicator -->
+        <div id="loading-message" class="flex justify-center items-center py-10">
+            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-main-color mr-3" style="border-color: #fd4646;"></div>
+            <p class="text-xl text-text-color">Đang tải món ăn...</p>
+        </div>
+
+        <!-- CONTENT -->
+        <!-- Đặt ID cho khu vực này để JS có thể chèn sản phẩm -->
+        <div class="shop-content" id="product-list">
+            <!-- NỘI DUNG SẢN PHẨM SẼ ĐƯỢC THÊM BẰNG JS TỪ PHP API -->
+        </div>
+
+    </section>
+
+    <!-- Link to JS -->
+    <script src="main.js"></script>
+
+</body>
+</html>

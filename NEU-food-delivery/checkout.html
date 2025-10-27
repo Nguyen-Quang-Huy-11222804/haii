@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin Thanh toán - NEU Food</title>
+    <!-- Tải Tailwind CSS để styling nhanh và đẹp -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải Boxicons cho các icon -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script>
+        // Cấu hình Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'main-color': '#fd4646',
+                        'text-color': '#171427',
+                        'neu-blue': '#007BFF',
+                        'neu-green': '#10B981',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'], // Đã chuyển sang Inter
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; 
+        }
+        /* Định nghĩa style cho input/select/textarea */
+        .form-input-style {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .form-input-style:focus {
+            outline: none;
+            border-color: #fd4646; /* main-color */
+            box-shadow: 0 0 0 3px rgba(253, 70, 70, 0.2);
+        }
+
+        /* Style cho các nút chọn Phương thức Thanh toán */
+        .payment-option {
+            display: flex;
+            align-items: center;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: white;
+            margin-bottom: 0.75rem;
+        }
+        .payment-option:hover {
+            border-color: #fd4646;
+        }
+        .payment-option.active {
+            border-color: #fd4646;
+            box-shadow: 0 0 0 2px rgba(253, 70, 70, 0.5);
+            background-color: #fff5f5; /* Light red background */
+        }
+        .payment-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            color: #171427; /* text-color */
+        }
+        .payment-option.active .payment-icon {
+            color: #fd4646; /* main-color */
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-lg md:max-w-xl">
+        
+        <!-- Nút Quay lại -->
+        <a href="index.html" class="flex items-center text-text-color hover:text-main-color transition duration-200 mb-6 font-medium">
+            <i class='bx bx-arrow-back text-2xl mr-2'></i>
+            Quay lại Giỏ hàng
+        </a>
+
+        <!-- Tiêu đề -->
+        <h1 class="text-3xl font-extrabold text-text-color mb-8 border-b pb-4">Xác nhận Thanh toán</h1>
+
+        <form id="checkout-form" class="bg-white p-6 md:p-8 rounded-xl shadow-lg space-y-6">
+
+            <!-- PHẦN 1: THÔNG TIN LIÊN HỆ -->
+            <div class="border-b pb-4">
+                <h2 class="text-xl font-bold text-main-color mb-4 flex items-center">
+                    <i class='bx bxs-contact text-2xl mr-2'></i> Thông tin Người nhận
+                </h2>
+                <!-- Trường Tên -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Họ và Tên</label>
+                    <input type="text" id="name" placeholder="Ví dụ: Nguyễn Văn A" class="form-input-style" required>
+                </div>
+
+                <!-- Trường Số điện thoại -->
+                <div class="mt-4">
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                    <input type="tel" id="phone" placeholder="Ví dụ: 0912345678" pattern="[0-9]{10,11}" class="form-input-style" required>
+                    <p class="text-xs text-gray-500 mt-1">Vui lòng nhập số điện thoại để shipper liên hệ.</p>
+                </div>
+            </div>
+
+            <!-- PHẦN 2: THÔNG TIN GIAO HÀNG -->
+            <div class="border-b pb-4">
+                <h2 class="text-xl font-bold text-main-color mb-4 flex items-center">
+                    <i class='bx bxs-map text-2xl mr-2'></i> Địa chỉ Giao hàng
+                </h2>
+                <!-- Trường Khu vực (Dropdown) -->
+                <div>
+                    <label for="area" class="block text-sm font-medium text-gray-700 mb-2">Khu vực trong Trường NEU</label>
+                    <select id="area" class="form-input-style" required>
+                        <option value="" disabled selected>Chọn khu vực nhận hàng</option>
+                        <option value="Tòa A1">Tòa nhà A1 (Hội trường lớn)</option>
+                        <option value="Tòa A2">Tòa nhà A2 (Giảng đường)</option>
+                        <option value="Tòa D">Tòa nhà D (Viện Đào tạo Quốc tế)</option>
+                        <option value="Tòa D2">Tòa nhà D2 (Khoa/Viện)</option>
+                        <option value="Kí túc xá">Khu Kí túc xá (Ghi rõ số phòng)</option>
+                        <option value="Sân tập thể dục">Khu Sân tập thể dục</option>
+                        <option value="Hầm gửi xe">Khu Hầm gửi xe</option>
+                        <option value="Khu vực Khác">Khu vực Khác (Ghi rõ ở phần chi tiết)</option>
+                    </select>
+                </div>
+
+                <!-- Trường Địa chỉ chi tiết (như ảnh mẫu) -->
+                <div class="mt-4">
+                    <label for="detail-address" class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ chi tiết (Số phòng, Tầng, Vị trí cụ thể)</label>
+                    <textarea id="detail-address" rows="3" placeholder="Ví dụ: Tòa A2, phòng 401 hoặc KTX D2, phòng 605" class="form-input-style resize-none" required></textarea>
+                </div>
+            </div>
+
+            <!-- PHẦN 3: PHƯƠNG THỨC THANH TOÁN -->
+            <div>
+                <h2 class="text-xl font-bold text-main-color mb-4 flex items-center">
+                    <i class='bx bxs-wallet text-2xl mr-2'></i> Phương thức Thanh toán
+                </h2>
+
+                <!-- Tùy chọn 1: Tiền mặt (COD) -->
+                <div class="payment-option active" data-method="cod">
+                    <i class='bx bxs-coin payment-icon'></i>
+                    <div>
+                        <p class="font-semibold text-text-color">Thanh toán khi nhận hàng (COD)</p>
+                        <p class="text-sm text-gray-500">Thanh toán tiền mặt cho shipper.</p>
+                    </div>
+                </div>
+
+                <!-- Tùy chọn 2: Chuyển khoản (Placeholder) -->
+                <div class="payment-option" data-method="transfer">
+                    <i class='bx bxs-bank payment-icon'></i>
+                    <div>
+                        <p class="font-semibold text-text-color">Chuyển khoản Ngân hàng (Placeholder)</p>
+                        <p class="text-sm text-gray-500">Thông tin chuyển khoản sẽ được hiển thị sau khi đặt hàng.</p>
+                    </div>
+                </div>
+
+                <input type="hidden" id="payment-method" name="payment-method" value="cod">
+            </div>
+
+            <!-- Nút Thanh toán -->
+            <button type="submit" id="pay-button" class="w-full py-3 bg-main-color text-white font-bold rounded-lg shadow-lg hover:bg-red-600 transition duration-200 flex items-center justify-center space-x-2 mt-8">
+                <i class='bx bxs-dollar-circle text-2xl'></i>
+                <span>XÁC NHẬN ĐẶT HÀNG</span>
+            </button>
+        </form>
+
+        <!-- Modal thông báo (Dùng cho thông báo đơn hàng thành công) -->
+        <div id="modal-success" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center z-50">
+            <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center">
+                <i class='bx bxs-check-circle text-6xl text-neu-green mb-4 animate-bounce'></i>
+                <h3 class="text-2xl font-bold text-text-color mb-3">ĐẶT HÀNG THÀNH CÔNG!</h3>
+                <p class="text-gray-600 mb-6">Đơn hàng của bạn đã được gửi. Shipper sẽ liên hệ trong vòng 5 phút.</p>
+                <button id="close-modal-button" class="py-2 px-6 bg-main-color text-white font-semibold rounded-lg hover:bg-red-600 transition duration-200">
+                    Trở về Trang chủ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Logic cho việc chọn Phương thức Thanh toán
+        const paymentOptions = document.querySelectorAll('.payment-option');
+        const paymentMethodInput = document.getElementById('payment-method');
+
+        paymentOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Xóa trạng thái active khỏi tất cả
+                paymentOptions.forEach(opt => opt.classList.remove('active'));
+
+                // Thêm trạng thái active cho tùy chọn được chọn
+                option.classList.add('active');
+
+                // Cập nhật giá trị hidden input
+                paymentMethodInput.value = option.getAttribute('data-method');
+            });
+        });
+
+        // Logic xử lý form khi nhấn Đặt hàng
+        const checkoutForm = document.getElementById('checkout-form');
+        const modalSuccess = document.getElementById('modal-success');
+        const closeModalButton = document.getElementById('close-modal-button');
+
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Lấy thông tin từ form
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const area = document.getElementById('area').value;
+            const detailAddress = document.getElementById('detail-address').value;
+            const paymentMethod = paymentMethodInput.value === 'cod' ? 'Thanh toán tiền mặt (COD)' : 'Chuyển khoản (Placeholder)';
+
+            // Lấy dữ liệu giỏ hàng từ localStorage (hoặc một nguồn dữ liệu khác)
+            // Trong môi trường thực, dữ liệu giỏ hàng sẽ được lấy từ Firestore hoặc state của ứng dụng
+            // Ở đây ta dùng mock data hoặc chuyển dữ liệu từ index.html qua
+            const mockCartData = localStorage.getItem('cartItems');
+            const mockTotal = localStorage.getItem('cartTotal');
+            
+            // Log dữ liệu đơn hàng (Chỉ mang tính chất mô phỏng)
+            console.log("--- Đơn hàng mới ---");
+            console.log("Tên: ", name);
+            console.log("SĐT: ", phone);
+            console.log("Khu vực: ", area);
+            console.log("Địa chỉ chi tiết: ", detailAddress);
+            console.log("P.Thức TT: ", paymentMethod);
+            console.log("Tổng tiền: ", mockTotal || "Chưa rõ (Lấy từ giỏ hàng)");
+            console.log("Chi tiết ĐH (JSON): ", mockCartData || "Không có chi tiết giỏ hàng");
+            console.log("---------------------");
+
+            // Mở modal thông báo thành công
+            modalSuccess.classList.remove('hidden');
+            modalSuccess.classList.add('flex');
+
+            // Xóa giỏ hàng sau khi đặt hàng thành công
+            localStorage.removeItem('cartItems');
+            localStorage.removeItem('cartTotal');
+
+            // Thêm logic để gửi dữ liệu đơn hàng lên Firestore nếu cần
+
+        });
+
+        // Đóng modal và quay về trang chủ
+        closeModalButton.addEventListener('click', () => {
+            modalSuccess.classList.remove('flex');
+            modalSuccess.classList.add('hidden');
+            // Chuyển hướng về trang chủ
+            window.location.href = 'index.html';
+        });
+
+        // Đảm bảo không cuộn khi modal mở
+        modalSuccess.addEventListener('click', (e) => {
+            if (e.target === modalSuccess) {
+                // Chỉ đóng khi click ra ngoài (tùy chọn)
+                // modalSuccess.classList.remove('flex');
+                // modalSuccess.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
