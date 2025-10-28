@@ -57,17 +57,17 @@
             <span class="close">&times;</span>
             <h3 id="product-modal-title">Thêm sản phẩm</h3>
             <form id="product-form">
-                <input type="hidden" id="product-id">
+                <input type="hidden" id="product-id" name="id">
                 <label>Tên sản phẩm:</label>
-                <input type="text" id="product-name" required>
+                <input type="text" id="product-name" name="name" required>
                 <label>Mô tả:</label>
-                <textarea id="product-description"></textarea>
+                <textarea id="product-description" name="description"></textarea>
                 <label>Giá:</label>
-                <input type="number" id="product-price" required>
+                <input type="number" id="product-price" name="price" required>
                 <label>URL ảnh:</label>
-                <input type="text" id="product-image">
+                <input type="text" id="product-image" name="image_url">
                 <label>Danh mục:</label>
-                <select id="product-category" required></select>
+                <select id="product-category" name="category_id" required></select>
                 <button type="submit">Lưu</button>
             </form>
         </div>
@@ -78,11 +78,11 @@
             <span class="close">&times;</span>
             <h3 id="category-modal-title">Thêm danh mục</h3>
             <form id="category-form">
-                <input type="hidden" id="category-id">
+                <input type="hidden" id="category-id" name="id">
                 <label>Tên danh mục:</label>
-                <input type="text" id="category-name" required>
+                <input type="text" id="category-name" name="name" required>
                 <label>Mô tả:</label>
-                <textarea id="category-description"></textarea>
+                <textarea id="category-description" name="description"></textarea>
                 <button type="submit">Lưu</button>
             </form>
         </div>
