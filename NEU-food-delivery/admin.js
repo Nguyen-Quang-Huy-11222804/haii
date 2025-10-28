@@ -122,21 +122,23 @@ async function loadProducts() {
 
 function editProduct(id) {
     // Load product data and show modal
-    fetch(API_BASE_URL + 'get_dish.php?id=' + id)
-        .then(response => response.json())
-        .then(result => {
-            if (result.success) {
-                const product = result.data;
-                document.getElementById('product-id').value = product.id;
-                document.getElementById('product-name').value = product.name;
-                document.getElementById('product-description').value = product.description;
-                document.getElementById('product-price').value = product.price;
-                document.getElementById('product-image').value = product.image_url;
-                document.getElementById('product-category').value = product.category_id;
-                document.getElementById('product-modal-title').textContent = 'Sửa sản phẩm';
-                document.getElementById('product-modal').style.display = 'block';
-            }
-        });
+    loadCategoriesForSelect().then(() => {
+        fetch(API_BASE_URL + 'get_dish.php?id=' + id)
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    const product = result.data;
+                    document.getElementById('product-id').value = product.id;
+                    document.getElementById('product-name').value = product.name;
+                    document.getElementById('product-description').value = product.description;
+                    document.getElementById('product-price').value = product.price;
+                    document.getElementById('product-image').value = product.image_url;
+                    document.getElementById('product-category').value = product.category_id;
+                    document.getElementById('product-modal-title').textContent = 'Sửa sản phẩm';
+                    document.getElementById('product-modal').style.display = 'block';
+                }
+            });
+    });
 }
 
 function deleteProduct(id) {
