@@ -21,6 +21,31 @@ if ($conn->connect_error) {
 // Thiết lập mã hóa cho kết nối
 $conn->set_charset("utf8mb4");
 
+// Hàm thiết lập CORS headers cho phép credentials
+function set_cors_headers() {
+    // Lấy origin từ request
+    $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+    
+    // Chỉ cho phép origin cụ thể khi credentials được sử dụng
+    if ($origin) {
+        header("Access-Control-Allow-Origin: $origin");
+        // Cho phép gửi credentials (cookies, session) chỉ khi có origin cụ thể
+        header('Access-Control-Allow-Credentials: true');
+    } else {
+        // Không có origin header - có thể là same-origin request
+        // Không set Access-Control-Allow-Origin để cho phép same-origin requests
+    }
+    
+    // Các headers được phép
+    header('Access-Control-Allow-Headers: Content-Type, Accept');
+    
+    // Các phương thức được phép
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    
+    // Cache preflight request
+    header('Access-Control-Max-Age: 86400');
+}
+
 // Hàm tiện ích để làm sạch dữ liệu đầu vào (ngăn chặn SQL Injection)
 function sanitize_input($data) {
     global $conn;
@@ -35,8 +60,11 @@ function sanitize_input($data) {
 
 // Hàm tiện ích để trả về phản hồi JSON
 function respond($success, $message, $data = null) {
+    // Set CORS headers first
+    set_cors_headers();
     header('Content-Type: application/json');
-    echo json_encode(['success' => $success, 'message' => $message, 'data' => $data]);
+    // Use JSON_UNESCAPED_UNICODE for proper Vietnamese character display
+    echo json_encode(['success' => $success, 'message' => $message, 'data' => $data], JSON_UNESCAPED_UNICODE);
     exit();
 }
 ?>

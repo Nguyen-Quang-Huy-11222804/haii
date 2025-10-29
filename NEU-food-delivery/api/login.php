@@ -2,13 +2,19 @@
 // Bắt đầu bằng việc đưa vào file cấu hình
 require_once('../config.php');
 
-// Thiết lập header và cho phép CORS
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+// Thiết lập CORS headers
+set_cors_headers();
+
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
 // Chỉ chấp nhận phương thức POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
+    header('Content-Type: application/json');
     echo json_encode(["success" => false, "message" => "Phương thức không hợp lệ."]);
     $conn->close();
     exit();
@@ -21,6 +27,7 @@ $password = isset($_POST['password']) ? $_POST['password'] : ''; // Mật khẩu
 // --- 1. Kiểm tra tính hợp lệ cơ bản ---
 if (empty($email) || empty($password)) {
     http_response_code(400);
+    header('Content-Type: application/json');
     echo json_encode(["success" => false, "message" => "Vui lòng điền đầy đủ email và mật khẩu."]);
     $conn->close();
     exit();
@@ -51,6 +58,7 @@ if ($result->num_rows === 1) {
         $_SESSION['loggedin'] = true;
         
         http_response_code(200);
+        header('Content-Type: application/json');
         echo json_encode([
             "success" => true, 
             "message" => "Đăng nhập thành công!",
@@ -65,11 +73,13 @@ if ($result->num_rows === 1) {
     } else {
         // Sai mật khẩu
         http_response_code(401); // Unauthorized
+        header('Content-Type: application/json');
         echo json_encode(["success" => false, "message" => "Mật khẩu không chính xác."]);
     }
 } else {
     // Không tìm thấy email
     http_response_code(401); // Unauthorized
+    header('Content-Type: application/json');
     echo json_encode(["success" => false, "message" => "Email chưa được đăng kí hoặc không tồn tại."]);
 }
 
