@@ -83,6 +83,9 @@ try {
     // --- 5. Commit Giao dịch nếu mọi thứ thành công ---
     $conn->commit();
     
+    // Note: We manually encode JSON here instead of using respond() because:
+    // 1. We need JSON_UNESCAPED_UNICODE for Vietnamese characters
+    // 2. We need to close the database connection after the response
     http_response_code(200);
     header('Content-Type: application/json');
     echo json_encode([

@@ -63,7 +63,8 @@ function respond($success, $message, $data = null) {
     // Set CORS headers first
     set_cors_headers();
     header('Content-Type: application/json');
-    echo json_encode(['success' => $success, 'message' => $message, 'data' => $data]);
+    // Use JSON_UNESCAPED_UNICODE for proper Vietnamese character display
+    echo json_encode(['success' => $success, 'message' => $message, 'data' => $data], JSON_UNESCAPED_UNICODE);
     exit();
 }
 ?>
