@@ -183,6 +183,7 @@
         </div>
     </div>
 
+    <script src="main.js"></script>
     <script>
         // Logic cho việc chọn Phương thức Thanh toán
         const paymentOptions = document.querySelectorAll('.payment-option');
@@ -199,67 +200,6 @@
                 // Cập nhật giá trị hidden input
                 paymentMethodInput.value = option.getAttribute('data-method');
             });
-        });
-
-        // Logic xử lý form khi nhấn Đặt hàng
-        const checkoutForm = document.getElementById('checkout-form');
-        const modalSuccess = document.getElementById('modal-success');
-        const closeModalButton = document.getElementById('close-modal-button');
-
-        checkoutForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Lấy thông tin từ form
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            const area = document.getElementById('area').value;
-            const detailAddress = document.getElementById('detail-address').value;
-            const paymentMethod = paymentMethodInput.value === 'cod' ? 'Thanh toán tiền mặt (COD)' : 'Chuyển khoản (Placeholder)';
-
-            // Lấy dữ liệu giỏ hàng từ localStorage (hoặc một nguồn dữ liệu khác)
-            // Trong môi trường thực, dữ liệu giỏ hàng sẽ được lấy từ Firestore hoặc state của ứng dụng
-            // Ở đây ta dùng mock data hoặc chuyển dữ liệu từ index.html qua
-            const mockCartData = localStorage.getItem('cartItems');
-            const mockTotal = localStorage.getItem('cartTotal');
-            
-            // Log dữ liệu đơn hàng (Chỉ mang tính chất mô phỏng)
-            console.log("--- Đơn hàng mới ---");
-            console.log("Tên: ", name);
-            console.log("SĐT: ", phone);
-            console.log("Khu vực: ", area);
-            console.log("Địa chỉ chi tiết: ", detailAddress);
-            console.log("P.Thức TT: ", paymentMethod);
-            console.log("Tổng tiền: ", mockTotal || "Chưa rõ (Lấy từ giỏ hàng)");
-            console.log("Chi tiết ĐH (JSON): ", mockCartData || "Không có chi tiết giỏ hàng");
-            console.log("---------------------");
-
-            // Mở modal thông báo thành công
-            modalSuccess.classList.remove('hidden');
-            modalSuccess.classList.add('flex');
-
-            // Xóa giỏ hàng sau khi đặt hàng thành công
-            localStorage.removeItem('cartItems');
-            localStorage.removeItem('cartTotal');
-
-            // Thêm logic để gửi dữ liệu đơn hàng lên Firestore nếu cần
-
-        });
-
-        // Đóng modal và quay về trang chủ
-        closeModalButton.addEventListener('click', () => {
-            modalSuccess.classList.remove('flex');
-            modalSuccess.classList.add('hidden');
-            // Chuyển hướng về trang chủ
-            window.location.href = 'index.html';
-        });
-
-        // Đảm bảo không cuộn khi modal mở
-        modalSuccess.addEventListener('click', (e) => {
-            if (e.target === modalSuccess) {
-                // Chỉ đóng khi click ra ngoài (tùy chọn)
-                // modalSuccess.classList.remove('flex');
-                // modalSuccess.classList.add('hidden');
-            }
         });
     </script>
 </body>

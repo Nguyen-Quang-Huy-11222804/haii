@@ -2,6 +2,85 @@
 // Base URL cho các API PHP của bạn (Đảm bảo đường dẫn này là chính xác so với file index.html)
 const API_BASE_URL = 'api/';
 
+// Global user session state
+let currentUser = null;
+
+// Check user session and update UI
+async function checkAndUpdateUserSession() {
+    try {
+        const response = await fetch(API_BASE_URL + 'check_session.php', {
+            credentials: 'include'
+        });
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+            currentUser = result.data;
+            updateUserUI(true);
+        } else {
+            currentUser = null;
+            updateUserUI(false);
+        }
+    } catch (error) {
+        console.error('Error checking session:', error);
+        currentUser = null;
+        updateUserUI(false);
+    }
+}
+
+// Update user interface based on login status
+function updateUserUI(isLoggedIn) {
+    const authLink = document.querySelector('.nav-auth-link');
+    if (!authLink) return;
+    
+    if (isLoggedIn && currentUser) {
+        // Show user name and logout option
+        authLink.innerHTML = `
+            <i class='bx bx-user' style="margin-right: 4px;"></i> 
+            <span>${currentUser.fullname}</span>
+        `;
+        authLink.href = '#';
+        authLink.onclick = (e) => {
+            e.preventDefault();
+            showUserMenu();
+        };
+    } else {
+        // Show login/register link
+        authLink.innerHTML = `
+            <i class='bx bx-user' style="margin-right: 4px;"></i> Đăng nhập/Đăng kí
+        `;
+        authLink.href = 'auth.html';
+        authLink.onclick = null;
+    }
+}
+
+// Show user menu dropdown
+function showUserMenu() {
+    showModal('Tài khoản', `Xin chào, ${currentUser.fullname}!\n\nBạn muốn đăng xuất?`, true).then(async (confirmed) => {
+        if (confirmed) {
+            await logoutUser();
+        }
+    });
+}
+
+// Logout user
+async function logoutUser() {
+    try {
+        await fetch(API_BASE_URL + 'logout.php', {
+            credentials: 'include'
+        });
+        currentUser = null;
+        updateUserUI(false);
+        showModal('Thành công', 'Đã đăng xuất thành công.');
+        // Redirect to home if on checkout page
+        if (window.location.pathname.includes('checkout.html')) {
+            window.location.href = 'index.html';
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        showModal('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+    }
+}
+
 // Hàm hiển thị Modal (thay thế alert/confirm)
 function showModal(title, message, isConfirm = false) {
     // Logic Modal đã được tối ưu để hoạt động độc lập
@@ -118,6 +197,9 @@ if (document.readyState == 'loading') {
 }
 
 function ready() {
+    // Check user session first
+    checkAndUpdateUserSession();
+    
     // Khởi tạo các event listeners cho Giỏ hàng
     setupCartListeners();
     // Tải danh mục và món ăn động từ API
@@ -309,6 +391,15 @@ function buyButtonClicked() {
         showModal("Giỏ hàng trống", "Giỏ hàng của bạn đang trống! Vui lòng thêm món ăn.", false);
         return;
     }
+    
+    // Check if user is logged in
+    if (!currentUser) {
+        showModal("Yêu cầu đăng nhập", "Vui lòng đăng nhập để tiếp tục thanh toán.", false).then(() => {
+            window.location.href = "auth.html";
+        });
+        return;
+    }
+    
     // Chuyển hướng đến trang thanh toán
     window.location.href = "checkout.html";
 }
@@ -476,12 +567,15 @@ function setupAuthForm() {
                         'Accept': 'application/json',
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
                     },
+                    credentials: 'include',
                     body: body
                 });
                 console.log('Login: response url', resp.url);
 
                 const data = await resp.json().catch(() => ({ success: false, message: 'Phản hồi không hợp lệ từ server.' }));
                 if (data.success) {
+                    // Update current user state
+                    currentUser = data.user;
                     await showModal('Thành công', data.message || 'Đăng nhập thành công.');
                     // Redirect based on role
                     if (data.user && data.user.role === 'admin') {
@@ -558,6 +652,115 @@ function setupAuthForm() {
 }
 
 function setupCheckoutForm() {
-    // Logic Thanh toán (cần file checkout.html)
-    // Sẽ chứa fetch() gọi place_order.php
+    const checkoutForm = document.getElementById('checkout-form');
+    if (!checkoutForm) {
+        console.warn('Checkout form not found, skipping setupCheckoutForm.');
+        return;
+    }
+
+    // Check if user is logged in on checkout page
+    checkAndUpdateUserSession().then(() => {
+        if (!currentUser) {
+            showModal('Yêu cầu đăng nhập', 'Vui lòng đăng nhập để tiếp tục thanh toán.', false).then(() => {
+                window.location.href = 'auth.html';
+            });
+            return;
+        } else {
+            // Pre-fill user's name in the form
+            const nameInput = document.getElementById('name');
+            if (nameInput && currentUser.fullname) {
+                nameInput.value = currentUser.fullname;
+            }
+        }
+    });
+
+    checkoutForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Double check user is logged in before submitting
+        if (!currentUser) {
+            showModal('Yêu cầu đăng nhập', 'Vui lòng đăng nhập để tiếp tục thanh toán.', false).then(() => {
+                window.location.href = 'auth.html';
+            });
+            return;
+        }
+
+        // Lấy thông tin từ form
+        const receiverName = document.getElementById('name').value.trim();
+        const phoneNumber = document.getElementById('phone').value.trim();
+        const areaAddress = document.getElementById('area').value;
+        const detailAddress = document.getElementById('detail-address').value.trim();
+        const paymentMethod = document.getElementById('payment-method').value;
+
+        // Validate input
+        if (!receiverName || !phoneNumber || !areaAddress || !detailAddress) {
+            showModal('Không hợp lệ', 'Vui lòng điền đầy đủ thông tin giao hàng.');
+            return;
+        }
+
+        // Lấy giỏ hàng từ localStorage
+        const cart = getCart();
+        if (cart.length === 0) {
+            showModal('Lỗi', 'Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi đặt hàng.');
+            return;
+        }
+
+        // Chuẩn bị dữ liệu đơn hàng
+        const orderData = {
+            receiver_name: receiverName,
+            phone_number: phoneNumber,
+            area_address: areaAddress,
+            detail_address: detailAddress,
+            payment_method: paymentMethod,
+            cart_items: cart
+        };
+
+        console.log('Đang gửi đơn hàng:', orderData);
+
+        try {
+            // Gửi đơn hàng lên server
+            const response = await fetch(API_BASE_URL + 'place_order.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(orderData)
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                // Xóa giỏ hàng sau khi đặt hàng thành công
+                localStorage.removeItem('neu_food_cart');
+                updateCartCount();
+                updatetotal();
+
+                // Hiển thị modal thành công
+                const modalSuccess = document.getElementById('modal-success');
+                if (modalSuccess) {
+                    modalSuccess.classList.remove('hidden');
+                    modalSuccess.classList.add('flex');
+
+                    // Xử lý nút đóng modal
+                    const closeModalButton = document.getElementById('close-modal-button');
+                    if (closeModalButton) {
+                        closeModalButton.onclick = () => {
+                            window.location.href = 'index.html';
+                        };
+                    }
+                } else {
+                    // Fallback nếu không có modal
+                    await showModal('Thành công', result.message || 'Đơn hàng đã được đặt thành công!');
+                    window.location.href = 'index.html';
+                }
+            } else {
+                showModal('Lỗi', result.message || 'Không thể đặt hàng. Vui lòng thử lại.');
+            }
+        } catch (error) {
+            console.error('Lỗi khi đặt hàng:', error);
+            showModal('Lỗi', 'Không thể kết nối tới server. Vui lòng thử lại.');
+        }
+    });
 }
