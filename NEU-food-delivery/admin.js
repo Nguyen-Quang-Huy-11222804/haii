@@ -2,15 +2,35 @@
 const API_BASE_URL = 'api/';
 
 // Check if admin is logged in
-function checkAdminAuth() {
-    // This would typically check session, but for simplicity, assume logged in
-    // In production, check session via API
-    return true;
+async function checkAdminAuth() {
+    try {
+        const response = await fetch(API_BASE_URL + 'check_session.php', {
+            credentials: 'include'
+        });
+        const result = await response.json();
+        
+        if (result.success && result.data && result.data.role === 'admin') {
+            // Update admin header with user name
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.textContent = `Đăng xuất (${result.data.fullname})`;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.error('Error checking admin session:', error);
+        return false;
+    }
 }
 
-if (!checkAdminAuth()) {
-    window.location.href = 'auth.html';
-}
+// Check auth and redirect if needed
+checkAdminAuth().then(isAdmin => {
+    if (!isAdmin) {
+        window.location.href = 'auth.html';
+    }
+});
 
 // Navigation
 document.querySelectorAll('.nav-link').forEach(link => {
@@ -326,7 +346,9 @@ document.getElementById('category-form').addEventListener('submit', async (e) =>
 
 // Logout
 document.getElementById('logout-btn').addEventListener('click', () => {
-    fetch(API_BASE_URL + 'logout.php')
+    fetch(API_BASE_URL + 'logout.php', {
+        credentials: 'include'
+    })
         .then(() => {
             window.location.href = 'index.html';
         });

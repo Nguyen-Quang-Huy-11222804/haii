@@ -6,6 +6,13 @@ require_once('../config.php');
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type'); // Quan trọng cho fetch() với JSON body
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
 // Chỉ chấp nhận phương thức POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -20,9 +27,15 @@ $json_data = file_get_contents('php://input');
 $data = json_decode($json_data, true);
 
 // --- 2. Kiểm tra trạng thái đăng nhập ---
-$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0; // Gán 0 nếu là khách vãng lai
-// Mặc dù chúng ta nên yêu cầu đăng nhập, nhưng ta vẫn xử lý cho trường hợp user_id = 0
-// if (!$user_id) { ... báo lỗi }
+// Yêu cầu người dùng phải đăng nhập để đặt hàng
+if (!isset($_SESSION['user_id']) || !$_SESSION['user_id']) {
+    http_response_code(401);
+    echo json_encode(["success" => false, "message" => "Vui lòng đăng nhập để đặt hàng."]);
+    $conn->close();
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
 
 // --- 3. Kiểm tra dữ liệu bắt buộc ---
 if (empty($data['receiver_name']) || empty($data['phone_number']) || empty($data['cart_items'])) {
