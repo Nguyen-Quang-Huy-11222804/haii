@@ -1,7 +1,6 @@
 <?php
 require_once '../config.php';
 
-header('Content-Type: application/json');
 set_cors_headers();
 
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {

@@ -26,16 +26,15 @@ function set_cors_headers() {
     // Lấy origin từ request
     $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
     
-    // Cho phép origin cụ thể (hoặc tất cả nếu trong môi trường phát triển)
+    // Chỉ cho phép origin cụ thể khi credentials được sử dụng
     if ($origin) {
         header("Access-Control-Allow-Origin: $origin");
+        // Cho phép gửi credentials (cookies, session) chỉ khi có origin cụ thể
+        header('Access-Control-Allow-Credentials: true');
     } else {
-        // Fallback cho trường hợp không có origin header
-        header("Access-Control-Allow-Origin: *");
+        // Không có origin header - có thể là same-origin request
+        // Không set Access-Control-Allow-Origin để cho phép same-origin requests
     }
-    
-    // Cho phép gửi credentials (cookies, session)
-    header('Access-Control-Allow-Credentials: true');
     
     // Các headers được phép
     header('Access-Control-Allow-Headers: Content-Type, Accept');
@@ -61,11 +60,9 @@ function sanitize_input($data) {
 
 // Hàm tiện ích để trả về phản hồi JSON
 function respond($success, $message, $data = null) {
-    // Set CORS headers if not already set
-    if (!headers_sent()) {
-        set_cors_headers();
-        header('Content-Type: application/json');
-    }
+    // Set CORS headers first
+    set_cors_headers();
+    header('Content-Type: application/json');
     echo json_encode(['success' => $success, 'message' => $message, 'data' => $data]);
     exit();
 }

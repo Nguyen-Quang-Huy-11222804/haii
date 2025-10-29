@@ -3,8 +3,7 @@
 // File này sẽ tạo biến $conn (kết nối database) và bắt đầu session
 require_once('../config.php');
 
-// Thiết lập header và cho phép CORS
-header('Content-Type: application/json');
+// Thiết lập CORS headers
 set_cors_headers();
 
 // Handle preflight OPTIONS request
@@ -16,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Chỉ chấp nhận phương thức POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
+    header('Content-Type: application/json');
     echo json_encode(["success" => false, "message" => "Phương thức không hợp lệ."]);
     $conn->close();
     exit();
@@ -29,6 +29,7 @@ $fullname = isset($_POST['fullname']) ? sanitize_input($_POST['fullname']) : '';
 // --- 1. Kiểm tra tính hợp lệ cơ bản ---
 if (empty($email) || empty($password) || empty($fullname)) {
     http_response_code(400);
+    header('Content-Type: application/json');
     echo json_encode(["success" => false, "message" => "Vui lòng điền đầy đủ thông tin đăng kí."]);
     $conn->close();
     exit();
@@ -43,6 +44,7 @@ $stmt->store_result();
 
 if ($stmt->num_rows > 0) {
     http_response_code(409); // Conflict
+    header('Content-Type: application/json');
     echo json_encode(["success" => false, "message" => "Email này đã được đăng kí. Vui lòng sử dụng email khác."]);
     $stmt->close();
     $conn->close();
@@ -61,10 +63,12 @@ $stmt->bind_param("sss", $email, $fullname, $hashed_password);
 if ($stmt->execute()) {
     // --- 4. Trả về JSON thành công ---
     http_response_code(201); // Created
+    header('Content-Type: application/json');
     echo json_encode(["success" => true, "message" => "Đăng kí thành công! Bạn có thể đăng nhập ngay bây giờ."]);
 } else {
     // Lỗi khi thực hiện query
     http_response_code(500);
+    header('Content-Type: application/json');
     echo json_encode(["success" => false, "message" => "Lỗi hệ thống: Không thể đăng kí. Vui lòng thử lại."]);
 }
 
