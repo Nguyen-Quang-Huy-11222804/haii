@@ -2,11 +2,9 @@
 // Bắt đầu session và file cấu hình
 require_once('../config.php');
 
-// Thiết lập header và cho phép CORS
+// Thiết lập header và cho phép CORS với credentials
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Headers: Content-Type'); // Quan trọng cho fetch() với JSON body
-header('Access-Control-Allow-Methods: POST, OPTIONS');
+set_cors_headers();
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

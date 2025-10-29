@@ -3,9 +3,15 @@
 // File này sẽ tạo biến $conn (kết nối database) và bắt đầu session
 require_once('../config.php');
 
-// Thiết lập header và cho phép CORS (quan trọng khi chạy Front-end từ trình duyệt)
+// Thiết lập header và cho phép CORS
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *'); // Cho phép Front-end gọi từ localhost
+set_cors_headers();
+
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
 // Chỉ chấp nhận phương thức POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

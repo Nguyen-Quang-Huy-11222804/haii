@@ -2,9 +2,15 @@
 // Bắt đầu bằng việc đưa vào file cấu hình
 require_once('../config.php');
 
-// Thiết lập header và cho phép CORS
+// Thiết lập header và cho phép CORS với credentials
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+set_cors_headers();
+
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
 // Chỉ chấp nhận phương thức POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

@@ -21,6 +21,32 @@ if ($conn->connect_error) {
 // Thiết lập mã hóa cho kết nối
 $conn->set_charset("utf8mb4");
 
+// Hàm thiết lập CORS headers cho phép credentials
+function set_cors_headers() {
+    // Lấy origin từ request
+    $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+    
+    // Cho phép origin cụ thể (hoặc tất cả nếu trong môi trường phát triển)
+    if ($origin) {
+        header("Access-Control-Allow-Origin: $origin");
+    } else {
+        // Fallback cho trường hợp không có origin header
+        header("Access-Control-Allow-Origin: *");
+    }
+    
+    // Cho phép gửi credentials (cookies, session)
+    header('Access-Control-Allow-Credentials: true');
+    
+    // Các headers được phép
+    header('Access-Control-Allow-Headers: Content-Type, Accept');
+    
+    // Các phương thức được phép
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    
+    // Cache preflight request
+    header('Access-Control-Max-Age: 86400');
+}
+
 // Hàm tiện ích để làm sạch dữ liệu đầu vào (ngăn chặn SQL Injection)
 function sanitize_input($data) {
     global $conn;
@@ -35,7 +61,11 @@ function sanitize_input($data) {
 
 // Hàm tiện ích để trả về phản hồi JSON
 function respond($success, $message, $data = null) {
-    header('Content-Type: application/json');
+    // Set CORS headers if not already set
+    if (!headers_sent()) {
+        set_cors_headers();
+        header('Content-Type: application/json');
+    }
     echo json_encode(['success' => $success, 'message' => $message, 'data' => $data]);
     exit();
 }
