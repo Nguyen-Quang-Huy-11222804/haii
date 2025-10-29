@@ -3,23 +3,18 @@
 session_start();
 
 // --- THÔNG TIN KẾT NỐI DATABASE ---
-// Mặc định XAMPP: DB_USERNAME = 'root', DB_PASSWORD = '' (rỗng)
-define('DB_SERVER', 'localhost');
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', ''); 
-define('DB_NAME', 'neu_food_db');
+// Using SQLite for simplicity (no installation needed)
+$db_file = __DIR__ . '/neu_food.db';
 
-// Kết nối đến Database MySQL
-$conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-
-// Kiểm tra kết nối
-if ($conn->connect_error) {
-    http_response_code(500); // Internal Server Error
-    die(json_encode(["success" => false, "message" => "Lỗi kết nối database: " . $conn->connect_error]));
+// Kết nối đến Database SQLite
+try {
+    $conn = new PDO("sqlite:$db_file");
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch(PDOException $e) {
+    http_response_code(500);
+    die(json_encode(["success" => false, "message" => "Lỗi kết nối database: " . $e->getMessage()]));
 }
-
-// Thiết lập mã hóa cho kết nối
-$conn->set_charset("utf8mb4");
 
 // Hàm thiết lập CORS headers cho phép credentials
 function set_cors_headers() {
@@ -53,7 +48,10 @@ function sanitize_input($data) {
         $data = trim($data);
         $data = stripslashes($data);
         $data = htmlspecialchars($data);
-        $data = $conn->real_escape_string($data);
+        // For SQLite, use PDO quote
+        $data = $conn->quote($data);
+        // Remove the quotes added by quote()
+        $data = substr($data, 1, -1);
     }
     return $data;
 }

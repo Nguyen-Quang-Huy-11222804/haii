@@ -8,22 +8,22 @@ if ($_SERVER["REQUEST_METHOD"] !== "GET") {
 }
 
 // Truy vấn lấy danh mục
-$sql = "SELECT id, name, description FROM categories WHERE is_active = TRUE ORDER BY id ASC";
+$sql = "SELECT id, name, description FROM categories WHERE is_active = 1 ORDER BY id ASC";
 $result = $conn->query($sql);
 
 if ($result) {
     $categories = [];
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $categories[] = $row;
-        }
+    foreach($result as $row) {
+        $categories[] = $row;
+    }
+    if (count($categories) > 0) {
         respond(true, "Tải danh mục thành công.", $categories);
     } else {
         respond(false, "Không tìm thấy danh mục nào.", []);
     }
 } else {
-    respond(false, "Lỗi truy vấn SQL: " . $conn->error);
+    respond(false, "Lỗi truy vấn SQL.");
 }
 
-$conn->close();
+$conn = null;
 ?>

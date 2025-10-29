@@ -20,20 +20,19 @@ if (isset($data['id']) && $data['id']) {
     $id = (int)$data['id'];
     $sql = "UPDATE categories SET name = ?, description = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssi", $name, $description, $id);
+    $result = $stmt->execute([$name, $description, $id]);
 } else {
     // Insert
     $sql = "INSERT INTO categories (name, description) VALUES (?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $name, $description);
+    $result = $stmt->execute([$name, $description]);
 }
 
-if ($stmt->execute()) {
+if ($result) {
     respond(true, "Lưu danh mục thành công.");
 } else {
-    respond(false, "Lỗi lưu danh mục: " . $stmt->error);
+    respond(false, "Lỗi lưu danh mục.");
 }
 
-$stmt->close();
-$conn->close();
+$conn = null;
 ?>

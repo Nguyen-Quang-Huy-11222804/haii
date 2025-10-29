@@ -1,68 +1,72 @@
--- Database setup for NEU Food Delivery
--- Run this SQL script to create the necessary tables
+-- Database setup for NEU Food Delivery (SQLite version)
+-- This will create tables in neu_food.db
 
-CREATE DATABASE IF NOT EXISTS neu_food_db;
-USE neu_food_db;
+-- Enable foreign keys
+PRAGMA foreign_keys = ON;
 
 -- Users table (for customers and admin)
 CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    fullname VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL, -- Hashed password
-    role ENUM('customer', 'admin') DEFAULT 'customer',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT UNIQUE NOT NULL,
+    fullname TEXT NOT NULL,
+    password TEXT NOT NULL,
+    role TEXT DEFAULT 'customer',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Categories table
 CREATE TABLE IF NOT EXISTS categories (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
     description TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    is_active INTEGER DEFAULT 1,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Dishes table (products)
 CREATE TABLE IF NOT EXISTS dishes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
     description TEXT,
-    price INT NOT NULL, -- Price in VND
-    image_url VARCHAR(500),
-    category_id INT,
-    is_available BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    price INTEGER NOT NULL,
+    image_url TEXT,
+    category_id INTEGER,
+    is_available INTEGER DEFAULT 1,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
 );
 
 -- Orders table
 CREATE TABLE IF NOT EXISTS orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT, -- Can be NULL for guest orders
-    receiver_name VARCHAR(255) NOT NULL,
-    phone_number VARCHAR(20) NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    receiver_name TEXT NOT NULL,
+    phone_number TEXT NOT NULL,
     delivery_address TEXT NOT NULL,
-    total_amount INT NOT NULL,
-    status ENUM('Pending', 'Confirmed', 'Shipping', 'Delivered', 'Cancelled') DEFAULT 'Pending',
-    payment_method VARCHAR(100) DEFAULT 'COD',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    total_amount INTEGER NOT NULL,
+    status TEXT DEFAULT 'Pending',
+    payment_method TEXT DEFAULT 'COD',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- Order items table
 CREATE TABLE IF NOT EXISTS order_items (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    dish_id INT NOT NULL,
-    quantity INT NOT NULL,
-    price_at_time INT NOT NULL, -- Price at the time of order
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL,
+    dish_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    price_at_time INTEGER NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY (dish_id) REFERENCES dishes(id) ON DELETE CASCADE
 );
 
 -- Tao tai khoan thong thuong roi vao database chuyen role thanh admin
+
+-- Insert admin user (password: admin123)
+INSERT OR IGNORE INTO users (email, fullname, password, role) VALUES
+('admin@neu.edu.vn', 'Admin NEU', 'admin123', 'admin');
 
 -- Insert sample categories
 INSERT INTO categories (name, description) VALUES

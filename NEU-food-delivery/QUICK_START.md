@@ -1,52 +1,61 @@
-# Quick Start Guide - Testing the Fix
+# Quick Start Guide - Testing the Fix (SQLite Version)
 
-## For Developers/Testers
+## Prerequisites Setup
+1. **PHP installed** (version 7.4 or higher with PDO SQLite extension)
+2. **Web server** running (Apache/Nginx built-in PHP server)
+3. **Database**: SQLite (no installation needed - uses local file)
 
-### Prerequisites Setup
-1. Ensure XAMPP/WAMP is running with Apache and MySQL
-2. Database `neu_food_db` is created and populated with sample data
-3. Web server is pointing to the NEU-food-delivery directory
+## Quick Test (5 minutes)
 
-### Quick Test (5 minutes)
+#### Step 1: Setup Database
+```bash
+# Run the setup script in browser:
+http://localhost/NEU-food-delivery/setup.php
+```
+This will create `neu_food.db` with all tables and sample data.
 
-#### Step 1: Test Order Placement
+#### Step 2: Test Main Site
 ```bash
 # Open in browser:
 http://localhost/NEU-food-delivery/index.html
 ```
 
-1. Click on any product's shopping bag icon to add to cart
-2. Click the cart icon (top right) to view cart
-3. Click "Thanh toán" button
-4. Fill in the form:
+1. Browse products (should load from SQLite database)
+2. Click shopping bag icons to add items to cart
+3. Click cart icon (top right) to view cart
+4. Click "Thanh toán" button
+5. Fill in the form:
    - Họ và Tên: Test User
    - Số điện thoại: 0912345678
    - Khu vực: Tòa A1
    - Địa chỉ chi tiết: Phòng 101
-5. Click "XÁC NHẬN ĐẶT HÀNG"
-6. ✅ Success modal should appear
-7. ✅ Cart count should reset to 0
+6. Click "XÁC NHẬN ĐẶT HÀNG"
+7. ✅ Success modal should appear
+8. ✅ Cart count should reset to 0
 
-#### Step 2: Verify in Admin Panel
+#### Step 3: Verify in Admin Panel
 ```bash
 # Open in browser:
 http://localhost/NEU-food-delivery/admin.html
 ```
 
-1. Navigate to "Quản lý đơn hàng" (should be default view)
-2. ✅ Your order should appear with:
+1. Login with:
+   - Email: `admin@neu.edu.vn`
+   - Password: `admin123`
+2. Navigate to "Quản lý đơn hàng" (should be default view)
+3. ✅ Your order should appear with:
    - Customer name: Test User
    - Phone: 0912345678
    - Address: Tòa A1 - Phòng 101
    - Status: Pending
    - Correct total amount
 
-#### Step 3: Check Statistics
+#### Step 4: Check Statistics
 1. In admin panel, click "Thống kê"
 2. ✅ "Tổng đơn hàng" should show count >= 1
 3. ✅ "Doanh thu" shows 0 VNĐ (order is pending)
 
-#### Step 4: Test Revenue Calculation
+#### Step 5: Test Revenue Calculation
 1. Go back to "Quản lý đơn hàng"
 2. Change order status to "Delivered"
 3. Go to "Thống kê" again

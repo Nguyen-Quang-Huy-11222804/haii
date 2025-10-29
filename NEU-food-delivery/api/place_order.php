@@ -22,13 +22,8 @@ $json_data = file_get_contents('php://input');
 $data = json_decode($json_data, true);
 
 // --- 2. Kiểm tra trạng thái đăng nhập ---
-// Yêu cầu người dùng phải đăng nhập để đặt hàng
-if (!isset($_SESSION['user_id']) || !$_SESSION['user_id']) {
-    http_response_code(401);
-    respond(false, "Vui lòng đăng nhập để đặt hàng.");
-}
-
-$user_id = $_SESSION['user_id'];
+// Cho phép đặt hàng không cần đăng nhập (guest orders)
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 // --- 3. Kiểm tra dữ liệu bắt buộc ---
 if (empty($data['receiver_name']) || empty($data['phone_number']) || empty($data['cart_items'])) {
@@ -47,23 +42,19 @@ foreach ($data['cart_items'] as $item) {
 }
 
 // --- 4. Bắt đầu Giao dịch (Transaction) ---
-$conn->begin_transaction();
+$conn->beginTransaction();
 $success = true;
 
 try {
-    // --- A. INSERT vào bảng DonHang (orders) ---
+    // --- A. INSERT vào bảng orders ---
     $order_sql = "INSERT INTO orders (user_id, receiver_name, phone_number, delivery_address, total_amount, status) VALUES (?, ?, ?, ?, ?, 'Pending')";
     $stmt_order = $conn->prepare($order_sql);
-    $stmt_order->bind_param("isssi", $user_id, $receiver_name, $phone_number, $address, $total_amount);
+    $stmt_order->execute([$user_id, $receiver_name, $phone_number, $address, $total_amount]);
     
-    if (!$stmt_order->execute()) {
-        throw new Exception("Lỗi khi tạo đơn hàng chính.");
-    }
+    $order_id = $conn->lastInsertId();
+    $stmt_order->closeCursor();
     
-    $order_id = $conn->insert_id; // Lấy ID của đơn hàng vừa tạo
-    $stmt_order->close();
-    
-    // --- B. INSERT vào bảng ChiTietDonHang (order_items) ---
+    // --- B. INSERT vào bảng order_items ---
     $item_sql = "INSERT INTO order_items (order_id, dish_id, quantity, price_at_time) VALUES (?, ?, ?, ?)";
     $stmt_item = $conn->prepare($item_sql);
     
@@ -72,13 +63,9 @@ try {
         $quantity = (int)$item['quantity'];
         $price_at_time = (int)$item['price']; // Lưu giá tại thời điểm đặt hàng
         
-        $stmt_item->bind_param("iiis", $order_id, $dish_id, $quantity, $price_at_time);
-        
-        if (!$stmt_item->execute()) {
-            throw new Exception("Lỗi khi thêm chi tiết món ăn.");
-        }
+        $stmt_item->execute([$order_id, $dish_id, $quantity, $price_at_time]);
     }
-    $stmt_item->close();
+    $stmt_item->closeCursor();
     
     // --- 5. Commit Giao dịch nếu mọi thứ thành công ---
     $conn->commit();
@@ -95,7 +82,7 @@ try {
 
 } catch (Exception $e) {
     // --- 6. Rollback (Hủy) Giao dịch nếu có lỗi xảy ra ---
-    $conn->rollback();
+    $conn->rollBack();
     http_response_code(500);
     header('Content-Type: application/json');
     echo json_encode([
@@ -104,5 +91,5 @@ try {
     ], JSON_UNESCAPED_UNICODE);
 }
 
-$conn->close();
+$conn = null;
 ?>

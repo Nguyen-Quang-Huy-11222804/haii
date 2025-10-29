@@ -31,36 +31,32 @@ if (empty($email) || empty($password) || empty($fullname)) {
     http_response_code(400);
     header('Content-Type: application/json');
     echo json_encode(["success" => false, "message" => "Vui lòng điền đầy đủ thông tin đăng kí."]);
-    $conn->close();
     exit();
 }
 
 // --- 2. Kiểm tra Email đã tồn tại chưa ---
 $check_sql = "SELECT id FROM users WHERE email = ?";
 $stmt = $conn->prepare($check_sql);
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$stmt->store_result();
+$stmt->execute([$email]);
+$result = $stmt->fetch();
 
-if ($stmt->num_rows > 0) {
+if ($result) {
     http_response_code(409); // Conflict
     header('Content-Type: application/json');
     echo json_encode(["success" => false, "message" => "Email này đã được đăng kí. Vui lòng sử dụng email khác."]);
-    $stmt->close();
-    $conn->close();
     exit();
 }
-$stmt->close();
+$stmt->closeCursor();
 
-// --- 3. Mã hóa mật khẩu và Thực hiện INSERT ---
-// Mã hóa mật khẩu trước khi lưu vào database
-$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+// --- 3. Lưu mật khẩu plain text cho local testing ---
+// $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+$hashed_password = $password;
 
 $insert_sql = "INSERT INTO users (email, fullname, password) VALUES (?, ?, ?)";
 $stmt = $conn->prepare($insert_sql);
-$stmt->bind_param("sss", $email, $fullname, $hashed_password);
+$result = $stmt->execute([$email, $fullname, $hashed_password]);
 
-if ($stmt->execute()) {
+if ($result) {
     // --- 4. Trả về JSON thành công ---
     http_response_code(201); // Created
     header('Content-Type: application/json');
@@ -72,6 +68,5 @@ if ($stmt->execute()) {
     echo json_encode(["success" => false, "message" => "Lỗi hệ thống: Không thể đăng kí. Vui lòng thử lại."]);
 }
 
-$stmt->close();
-$conn->close();
+$conn = null;
 ?>

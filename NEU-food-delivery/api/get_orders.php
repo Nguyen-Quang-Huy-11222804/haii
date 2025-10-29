@@ -10,14 +10,14 @@ $result = $conn->query($sql);
 
 if ($result) {
     $orders = [];
-    while($row = $result->fetch_assoc()) {
+    foreach($result as $row) {
         $row['total_amount'] = (int)$row['total_amount'];
         $orders[] = $row;
     }
     respond(true, "Tải đơn hàng thành công.", $orders);
 } else {
-    respond(false, "Lỗi truy vấn: " . $conn->error);
+    respond(false, "Lỗi truy vấn: " . $conn->errorInfo()[2]);
 }
 
-$conn->close();
+$conn = null;
 ?>

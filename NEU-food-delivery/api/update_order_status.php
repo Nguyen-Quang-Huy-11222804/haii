@@ -22,14 +22,13 @@ if (!in_array($status, $allowed_statuses)) {
 
 $sql = "UPDATE orders SET status = ? WHERE id = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("si", $status, $order_id);
+$result = $stmt->execute([$status, $order_id]);
 
-if ($stmt->execute()) {
+if ($result) {
     respond(true, "Cập nhật trạng thái thành công.");
 } else {
-    respond(false, "Lỗi cập nhật: " . $stmt->error);
+    respond(false, "Lỗi cập nhật.");
 }
 
-$stmt->close();
-$conn->close();
+$conn = null;
 ?>

@@ -16,14 +16,13 @@ $id = (int)$data['id'];
 
 $sql = "DELETE FROM categories WHERE id = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id);
+$result = $stmt->execute([$id]);
 
-if ($stmt->execute()) {
+if ($result) {
     respond(true, "Xóa danh mục thành công.");
 } else {
-    respond(false, "Lỗi xóa danh mục: " . $stmt->error);
+    respond(false, "Lỗi xóa danh mục.");
 }
 
-$stmt->close();
-$conn->close();
+$conn = null;
 ?>

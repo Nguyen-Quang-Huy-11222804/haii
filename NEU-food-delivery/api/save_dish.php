@@ -23,20 +23,19 @@ if (isset($data['id']) && $data['id']) {
     $id = (int)$data['id'];
     $sql = "UPDATE dishes SET name = ?, description = ?, price = ?, image_url = ?, category_id = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssisii", $name, $description, $price, $image_url, $category_id, $id);
+    $result = $stmt->execute([$name, $description, $price, $image_url, $category_id, $id]);
 } else {
     // Insert
     $sql = "INSERT INTO dishes (name, description, price, image_url, category_id) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssisi", $name, $description, $price, $image_url, $category_id);
+    $result = $stmt->execute([$name, $description, $price, $image_url, $category_id]);
 }
 
-if ($stmt->execute()) {
+if ($result) {
     respond(true, "Lưu sản phẩm thành công.");
 } else {
-    respond(false, "Lỗi lưu sản phẩm: " . $stmt->error);
+    respond(false, "Lỗi lưu sản phẩm.");
 }
 
-$stmt->close();
-$conn->close();
+$conn = null;
 ?>

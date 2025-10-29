@@ -392,14 +392,7 @@ function buyButtonClicked() {
         return;
     }
     
-    // Check if user is logged in
-    if (!currentUser) {
-        showModal("Yêu cầu đăng nhập", "Vui lòng đăng nhập để tiếp tục thanh toán.", false).then(() => {
-            window.location.href = "auth.html";
-        });
-        return;
-    }
-    
+    // Allow guest checkout - no login required
     // Chuyển hướng đến trang thanh toán
     window.location.href = "checkout.html";
 }
@@ -658,14 +651,9 @@ function setupCheckoutForm() {
         return;
     }
 
-    // Check if user is logged in on checkout page
+    // Check if user is logged in on checkout page and pre-fill name if available
     checkAndUpdateUserSession().then(() => {
-        if (!currentUser) {
-            showModal('Yêu cầu đăng nhập', 'Vui lòng đăng nhập để tiếp tục thanh toán.', false).then(() => {
-                window.location.href = 'auth.html';
-            });
-            return;
-        } else {
+        if (currentUser) {
             // Pre-fill user's name in the form
             const nameInput = document.getElementById('name');
             if (nameInput && currentUser.fullname) {
@@ -676,14 +664,6 @@ function setupCheckoutForm() {
 
     checkoutForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-
-        // Double check user is logged in before submitting
-        if (!currentUser) {
-            showModal('Yêu cầu đăng nhập', 'Vui lòng đăng nhập để tiếp tục thanh toán.', false).then(() => {
-                window.location.href = 'auth.html';
-            });
-            return;
-        }
 
         // Lấy thông tin từ form
         const receiverName = document.getElementById('name').value.trim();

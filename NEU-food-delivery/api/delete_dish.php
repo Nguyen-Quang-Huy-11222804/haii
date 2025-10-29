@@ -16,14 +16,13 @@ $id = (int)$data['id'];
 
 $sql = "DELETE FROM dishes WHERE id = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id);
+$result = $stmt->execute([$id]);
 
-if ($stmt->execute()) {
+if ($result) {
     respond(true, "Xóa sản phẩm thành công.");
 } else {
-    respond(false, "Lỗi xóa sản phẩm: " . $stmt->error);
+    respond(false, "Lỗi xóa sản phẩm.");
 }
 
-$stmt->close();
-$conn->close();
+$conn = null;
 ?>

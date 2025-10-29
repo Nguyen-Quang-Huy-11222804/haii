@@ -29,26 +29,23 @@ if (empty($email) || empty($password)) {
     http_response_code(400);
     header('Content-Type: application/json');
     echo json_encode(["success" => false, "message" => "Vui lòng điền đầy đủ email và mật khẩu."]);
-    $conn->close();
     exit();
 }
 
-// --- 2. Truy vấn Database để lấy thông tin người dùng và mật khẩu đã mã hóa ---
+// --- 2. Truy vấn Database để lấy thông tin người dùng ---
 $sql = "SELECT id, fullname, email, password, role FROM users WHERE email = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
+$stmt->execute([$email]);
+$user = $stmt->fetch();
 
-if ($result->num_rows === 1) {
-    $user = $result->fetch_assoc();
-    $hashed_password = $user['password'];
+if ($user) {
+    $stored_password = $user['password'];
 
-    // --- 3. So sánh mật khẩu bằng password_verify ---
-    if (password_verify($password, $hashed_password)) {
+    // --- 3. So sánh mật khẩu (plain text for local testing) ---
+    if ($password === $stored_password) {
         
         // --- 4. Đăng nhập thành công: Lưu thông tin vào session ---
-        // Xóa mật khẩu đã mã hóa khỏi mảng user trước khi lưu vào session
+        // Xóa mật khẩu khỏi mảng user trước khi lưu vào session
         unset($user['password']);
         
         $_SESSION['user_id'] = $user['id'];
@@ -83,6 +80,5 @@ if ($result->num_rows === 1) {
     echo json_encode(["success" => false, "message" => "Email chưa được đăng kí hoặc không tồn tại."]);
 }
 
-$stmt->close();
-$conn->close();
+$conn = null;
 ?>
